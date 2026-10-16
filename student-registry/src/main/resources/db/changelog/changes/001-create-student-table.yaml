@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-student-table
+      author: alhimek17
+      changes:
+        - createTable:
+            tableName: student
+            remarks: Учёт студентов по специальностям
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_student
+                    nullable: false
+
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: specialty
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: enrolled_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: expelled_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+
+        - sql:
+            sql: >
+              ALTER TABLE student
+              ADD CONSTRAINT chk_student_status
+              CHECK (status IN ('ACTIVE', 'EXPELLED'));
+
+        - sql:
+            sql: >
+              ALTER TABLE student
+              ADD CONSTRAINT chk_student_expulsion
+              CHECK (
+                (status = 'ACTIVE' AND expelled_at IS NULL)
+                OR
+                (status = 'EXPELLED' AND expelled_at IS NOT NULL)
+              );
